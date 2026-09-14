@@ -56,6 +56,10 @@
         .stage-dropdown .deal-title-link:hover { color: #1d4ed8; text-decoration: underline; }
         .stage-dropdown .empty-message { color: #7a8aa0; font-size: 13px; text-align: center; padding: 15px 0; }
 
+        /* Цвета для ID и даты в списке сделок */
+        .stage-dropdown .deal-id { color: #1d4ed8; font-weight: 700; }
+        .stage-dropdown .deal-date { color: #16a34a; font-weight: 600; }
+
         .dropdown-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 999; }
         .dropdown-overlay.active { display: block; }
 
@@ -143,6 +147,10 @@
         <div class="info-stage">Запрос счёта</div>
         <div class="info-desc">Более <span class="info-days">10 дней</span> с даты начала (BEGINDATE).</div>
     </div>
+    <div class="info-row">
+        <div class="info-stage">Оплачено</div>
+        <div class="info-desc">Более <span class="info-days">20 дней</span> с даты фиксации 1.</div>
+    </div>
 </div>
 
 <div class="card">
@@ -224,7 +232,6 @@
     // ============================================================
     const overlay = document.getElementById('dropdownOverlay');
 
-    // Формат ДД.ММ.ГГГГ
     function formatDateDDMMYYYY(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
@@ -326,6 +333,7 @@
                 !document.getElementById('alertInfoModalParts').classList.contains('open'))
                 document.body.classList.remove('modal-open');
         }
+
         function renderDropdownContent(stageId) {
             const el = stageElements[stageId]; if (!el) return;
             const deals = dealsData[stageId] || [];
@@ -334,8 +342,19 @@
             deals.forEach(deal => {
                 const url = `https://b24-964ige.bitrix24.ru/crm/deal/show/${deal.ID}/`;
                 const alertIcon = deal._isAlert ? `<i class="fas fa-exclamation-circle deal-alert-icon"></i>` : `<span style="width:16px;display:inline-block"></span>`;
-                let titleText = deal.TITLE;
-                if (deal.UF_EXTRA && String(deal.UF_EXTRA).trim() !== '') titleText += ` <span class="deal-uf-field">(${deal.UF_EXTRA})</span>`;
+
+                const parts = [];
+                parts.push(`<span class="deal-id">№${deal.ID}</span>`);
+
+                let title = deal.TITLE || '';
+                const idPattern = new RegExp(`^№?\\s*${deal.ID}\\s*`);
+                title = title.replace(idPattern, '').trim();
+                if (title) parts.push(title);
+
+                if (deal.UF_EXTRA && String(deal.UF_EXTRA).trim() !== '') parts.push(`(${deal.UF_EXTRA})`);
+                if (deal.BEGINDATE_FORMATTED) parts.push(`<span class="deal-date">${deal.BEGINDATE_FORMATTED}</span>`);
+
+                const titleText = parts.join(' ');
                 html += `<div class="deal-item">${alertIcon}<a href="${url}" target="_blank" class="deal-title-link">${titleText}</a></div>`;
             });
             el.content.innerHTML = html;
@@ -399,6 +418,7 @@
                         dealsMap[stageId].push({
                             ID: deal.ID, TITLE: title, STAGE_ID: stageId,
                             BEGINDATE: deal.BEGINDATE,
+                            BEGINDATE_FORMATTED: formatDateDDMMYYYY(deal.BEGINDATE),
                             UF_CRM_1785307987: deal.UF_CRM_1785307987,
                             UF_CRM_1755597807: deal.UF_CRM_1755597807,
                             UF_EXTRA: deal.UF_CRM_1595995680751,
@@ -462,7 +482,10 @@
             'C2:1':                  'Товар на складе'
         };
         const STAGE_ORDER = Object.keys(STAGE_MAP);
-        const ALERT_STAGES = { 'C2:PREPARATION': true };
+        const ALERT_STAGES = {
+            'C2:PREPARATION':   true,   // Запрос счёта — > 10 дней от BEGINDATE
+            'C2:FINAL_INVOICE': true    // Оплачено — > 20 дней от UF_CRM_1755597807
+        };
 
         let dealsData = {}, alertCounts = {}, openDropdown = null, stageElements = {};
         const flowRow = document.getElementById('flowRowParts');
@@ -523,8 +546,6 @@
                 document.body.classList.remove('modal-open');
         }
 
-        // Формат: №42290 Прокладка парогенератора Колыванская ЦРБ 24.08.2026
-        // Ведущий номер из TITLE удаляется, чтобы не было дубля с №{ID}
         function renderDropdownContent(stageId) {
             const el = stageElements[stageId]; if (!el) return;
             const deals = dealsData[stageId] || [];
@@ -535,16 +556,15 @@
                 const alertIcon = deal._isAlert ? `<i class="fas fa-exclamation-circle deal-alert-icon"></i>` : `<span style="width:16px;display:inline-block"></span>`;
 
                 const parts = [];
-                parts.push(`№${deal.ID}`);
+                parts.push(`<span class="deal-id">№${deal.ID}</span>`);
 
-                // Убираем ведущий номер из TITLE, если он совпадает с ID
                 let title = deal.TITLE || '';
                 const idPattern = new RegExp(`^№?\\s*${deal.ID}\\s*`);
                 title = title.replace(idPattern, '').trim();
                 if (title) parts.push(title);
 
                 if (deal.UF_EXTRA) parts.push(deal.UF_EXTRA);
-                if (deal.BEGINDATE_FORMATTED) parts.push(deal.BEGINDATE_FORMATTED);
+                if (deal.BEGINDATE_FORMATTED) parts.push(`<span class="deal-date">${deal.BEGINDATE_FORMATTED}</span>`);
 
                 const titleText = parts.join(' ');
                 html += `<div class="deal-item">${alertIcon}<a href="${url}" target="_blank" class="deal-title-link">${titleText}</a></div>`;
@@ -552,16 +572,33 @@
             el.content.innerHTML = html;
         }
 
+        // Красные счётчики:
+        //  - C2:PREPARATION (Запрос счёта) — > 10 дней от BEGINDATE
+        //  - C2:FINAL_INVOICE (Оплачено)    — > 20 дней от UF_CRM_1755597807
         function checkAlertCondition(deal, stageId) {
-            if (stageId !== 'C2:PREPARATION') return false;
             const now = new Date();
             const moscowOffset = 3 * 60 * 60 * 1000;
             const nowMoscow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + moscowOffset);
-            const d = new Date(deal.BEGINDATE);
-            if (isNaN(d.getTime())) return false;
-            const dMoscow = new Date(d.getTime() + (d.getTimezoneOffset() * 60000) + moscowOffset);
-            const days = (nowMoscow - dMoscow) / (1000 * 60 * 60 * 24);
-            return days > 10;
+
+            function daysSince(dateStr) {
+                if (!dateStr) return null;
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return null;
+                const dMoscow = new Date(d.getTime() + (d.getTimezoneOffset() * 60000) + moscowOffset);
+                return (nowMoscow - dMoscow) / (1000 * 60 * 60 * 24);
+            }
+
+            if (stageId === 'C2:PREPARATION') {
+                const days = daysSince(deal.BEGINDATE);
+                return days !== null && days > 10;
+            }
+
+            if (stageId === 'C2:FINAL_INVOICE') {
+                const days = daysSince(deal.UF_CRM_1755597807);
+                return days !== null && days > 20;
+            }
+
+            return false;
         }
 
         function updateStages(countsMap, dealsMap) {
@@ -611,6 +648,7 @@
                             STAGE_ID: stageId,
                             BEGINDATE: deal.BEGINDATE,
                             BEGINDATE_FORMATTED: formatDateDDMMYYYY(deal.BEGINDATE),
+                            UF_CRM_1755597807: deal.UF_CRM_1755597807,
                             UF_EXTRA: deal.UF_CRM_1588570723112,
                             _isAlert: isAlert
                         });
