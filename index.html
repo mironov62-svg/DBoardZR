@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Участок СМТ и Запчасти — статус ремонтов</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; margin: 0; padding: 0; }
+        body { background: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 0; overflow-y: auto; }
+        .card { max-width: 1400px; width: 100%; background: transparent; display: block; height: auto !important; min-height: 0 !important; overflow: visible; padding: 15px 20px; }
+        h1 { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 20px; color: #0b1e3a; margin-bottom: 0; }
+        h1 small { font-weight: 400; font-size: 14px; color: #5a6d86; margin-left: 4px; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px; border-bottom: 1px solid #e6edf5; padding-bottom: 8px; }
+        .bitrix-link { background: #f0f4fe; padding: 5px 12px; border-radius: 20px; font-size: 12px; color: #1d4ed8; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.15s; }
+        .bitrix-link i { font-size: 12px; }
+        .bitrix-link:hover { background: #e2eaff; color: #0f3bb3; }
+        .btn-request { background: #1d4ed8; border: none; color: white; font-weight: 600; font-size: 13px; padding: 6px 16px; border-radius: 20px; box-shadow: 0 2px 5px rgba(29,78,216,0.2); cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-request i { font-size: 13px; }
+        .btn-request:hover { background: #1744c0; transform: translateY(-1px); }
+        .btn-request:active { transform: translateY(0); }
+        .btn-request:disabled { opacity: 0.6; pointer-events: none; }
+
+        .flow-block { display: flex; align-items: flex-start; gap: 18px; width: 100%; }
+        .alert-legend-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 8px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 20px; color: #b91c1c; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.15s; white-space: nowrap; user-select: none; }
+        .alert-legend-btn i { font-size: 13px; }
+        .alert-legend-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+        .alert-legend-btn:active { transform: scale(0.97); }
+        .flow-container { margin: 0; overflow-x: auto; overflow-y: visible; padding: 8px 0 10px; flex: 1; min-width: 0; }
+        .flow-row { display: flex; align-items: flex-start; justify-content: center; position: relative; gap: 40px; width: 100%; overflow: visible; min-width: fit-content; }
+
+        .stage-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; width: 70px; cursor: pointer; flex-shrink: 0; overflow: visible; }
+        .stage-wrapper:not(:last-child)::after { content: ''; position: absolute; top: 35px; left: 70px; width: 40px; height: 2px; background: #1d4ed8; z-index: 0; }
+
+        .stage-circle { position: relative; width: 70px; height: 70px; border-radius: 50%; background: white; border: 3px solid #1d4ed8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; color: #1d4ed8; z-index: 2; box-shadow: 0 0 0 6px white; transition: all 0.2s; cursor: pointer; flex-shrink: 0; }
+        .stage-circle:hover { transform: scale(1.05); box-shadow: 0 0 0 6px white, 0 4px 15px rgba(29,78,216,0.2); }
+        .stage-circle.active { border-color: #22c55e; background: #f0faf4; }
+
+        .stage-circle .count-badge { position: absolute; top: -8px; right: -8px; background: #22c55e; color: white; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 30px; min-width: 26px; text-align: center; box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3); border: 2px solid white; line-height: 1.3; z-index: 3; }
+        .stage-circle .alert-badge { position: absolute; top: auto; bottom: -8px; right: -8px; background: #ef4444; color: white; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 20px; min-width: 20px; text-align: center; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); border: 2px solid white; line-height: 1.2; z-index: 4; animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        .stage-label { font-size: 12px; font-weight: 500; color: #1e2f4a; text-align: center; line-height: 1.2; margin-top: 8px; width: 100%; min-height: 28px; display: flex; align-items: flex-start; justify-content: center; }
+
+        .stage-dropdown { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 1px solid #e6edf5; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 12px 16px; min-width: 400px; max-width: 80vw; max-height: 70vh; overflow-y: auto; z-index: 1000; text-align: left; }
+        .stage-dropdown.open { display: block; }
+        .stage-dropdown .dropdown-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #1d4ed8; }
+        .stage-dropdown .dropdown-header h3 { font-size: 16px; color: #0b1e3a; margin: 0; }
+        .stage-dropdown .dropdown-close { background: none; border: none; font-size: 20px; color: #7a8aa0; cursor: pointer; padding: 0 5px; }
+        .stage-dropdown .dropdown-close:hover { color: #1d4ed8; }
+
+        .stage-dropdown .deal-item { padding: 8px 0; border-bottom: 1px solid #f0f4fe; display: flex; align-items: center; gap: 10px; }
+        .stage-dropdown .deal-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .stage-dropdown .deal-alert-icon { color: #ef4444; font-size: 14px; min-width: 16px; text-align: center; }
+        .stage-dropdown .deal-title-link { flex: 1; color: #1e2f4a; font-size: 14px; font-weight: 500; text-decoration: none; display: block; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stage-dropdown .deal-title-link:hover { color: #1d4ed8; text-decoration: underline; }
+        .stage-dropdown .empty-message { color: #7a8aa0; font-size: 13px; text-align: center; padding: 15px 0; }
+
+        .dropdown-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 999; }
+        .dropdown-overlay.active { display: block; }
+
+        .alert-info-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); padding: 22px 26px; min-width: 380px; max-width: 560px; width: 90vw; max-height: 80vh; overflow-y: auto; z-index: 1100; }
+        .alert-info-modal.open { display: block; }
+        .alert-info-modal h3 { display: flex; align-items: center; gap: 10px; font-size: 17px; color: #0b1e3a; margin: 0 0 14px 0; padding-bottom: 10px; border-bottom: 2px solid #ef4444; }
+        .alert-info-modal h3 i { color: #ef4444; }
+        .alert-info-modal .alert-info-close { position: absolute; top: 14px; right: 18px; background: none; border: none; font-size: 22px; color: #7a8aa0; cursor: pointer; padding: 0 4px; line-height: 1; }
+        .alert-info-modal .alert-info-close:hover { color: #ef4444; }
+        .alert-info-modal .info-row { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f0f4fe; font-size: 13.5px; line-height: 1.45; }
+        .alert-info-modal .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .alert-info-modal .info-row .info-stage { flex-shrink: 0; width: 160px; font-weight: 600; color: #0b1e3a; }
+        .alert-info-modal .info-row .info-desc { color: #3a4a60; }
+        .alert-info-modal .info-row .info-days { display: inline-block; background: #fef2f2; color: #b91c1c; font-weight: 700; font-size: 12px; padding: 1px 8px; border-radius: 12px; margin-left: 4px; border: 1px solid #fecaca; }
+
+        .footer-note { margin-top: 12px; border-top: 1px solid #e6edf5; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 12px; color: #5a6d86; position: relative; z-index: 1; }
+        .footer-note .legend { display: flex; gap: 15px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 10px; background: #1d4ed8; border: 2px solid #1d4ed8; }
+        .legend-dot.green { background: #22c55e; border-color: #22c55e; }
+        .legend-dot.red { background: #ef4444; border-color: #ef4444; }
+        .webhook-info { font-size: 10px; color: #7a8aa0; background: #f8f9fa; padding: 3px 10px; border-radius: 12px; border: 1px solid #e6edf5; }
+        .status-message { background: #f0f4fe; padding: 4px 12px; border-radius: 12px; color: #1f3b5c; font-size: 12px; border: 1px solid #dbeafe; }
+        .status-message i { margin-right: 4px; }
+
+        body.modal-open { overflow: hidden; }
+
+        .funnel-divider { margin: 28px 0 10px; border-top: 2px dashed #dbeafe; width: 100%; }
+
+        @media (max-width: 900px) {
+            .flow-row { gap: 25px; }
+            .stage-wrapper:not(:last-child)::after { width: 25px; left: 70px; }
+            .card { padding: 12px 15px; }
+            .stage-dropdown { min-width: 300px; max-width: 90vw; }
+            .alert-legend-btn { font-size: 11px; padding: 6px 10px; margin-top: 16px; }
+        }
+        @media (max-width: 600px) {
+            .flow-block { flex-direction: column; gap: 6px; }
+            .alert-legend-btn { margin-top: 0; align-self: flex-start; }
+            .flow-row { gap: 15px; flex-wrap: nowrap; }
+            .stage-wrapper:not(:last-child)::after { width: 15px; left: 60px; top: 30px; }
+            .stage-circle { width: 60px; height: 60px; font-size: 18px; box-shadow: 0 0 0 5px white; }
+            .stage-label { font-size: 10px; min-height: 24px; margin-top: 6px; }
+            .stage-wrapper { width: 60px; }
+            .stage-dropdown { min-width: 260px; max-width: 92vw; padding: 10px 12px; }
+            .stage-dropdown .dropdown-header h3 { font-size: 14px; }
+            .stage-dropdown .deal-title-link { white-space: normal; }
+            .alert-info-modal { min-width: 0; padding: 18px 16px; }
+            .alert-info-modal .info-row { flex-direction: column; gap: 4px; }
+            .alert-info-modal .info-row .info-stage { width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dropdown-overlay" id="dropdownOverlay"></div>
+
+<!-- Модалка "Красные счётчики" для Участка СМТ -->
+<div class="alert-info-modal" id="alertInfoModalSMT">
+    <button class="alert-info-close" id="alertInfoCloseSMT">&times;</button>
+    <h3><i class="fas fa-exclamation-triangle"></i> Пояснения по красным счётчикам (Участок СМТ)</h3>
+    <div class="info-row">
+        <div class="info-stage">Решение о ремонте</div>
+        <div class="info-desc">Более <span class="info-days">3 дней</span> с даты получения МИ.</div>
+    </div>
+    <div class="info-row">
+        <div class="info-stage">Диагностика, ремонт</div>
+        <div class="info-desc">Более <span class="info-days">9 дней</span> с даты прихода на стадию.</div>
+    </div>
+    <div class="info-row">
+        <div class="info-stage">Заказаны ЗЧ</div>
+        <div class="info-desc">Более <span class="info-days">30 дней</span> с даты получения МИ.</div>
+    </div>
+    <div class="info-row">
+        <div class="info-stage">На выдачу</div>
+        <div class="info-desc">Более <span class="info-days">15 дней</span> с даты прихода на стадию.</div>
+    </div>
+</div>
+
+<!-- Модалка "Красные счётчики" для Запчастей -->
+<div class="alert-info-modal" id="alertInfoModalParts">
+    <button class="alert-info-close" id="alertInfoCloseParts">&times;</button>
+    <h3><i class="fas fa-exclamation-triangle"></i> Пояснения по красным счётчикам (Запчасти)</h3>
+    <div class="info-row">
+        <div class="info-stage">Запрос счёта</div>
+        <div class="info-desc">Более <span class="info-days">10 дней</span> с даты начала (BEGINDATE).</div>
+    </div>
+</div>
+
+<div class="card">
+    <!-- ================= ВОРОНКА 1: УЧАСТОК СМТ ================= -->
+    <div class="toolbar">
+        <h1>
+            <i class="fas fa-tools" style="color:#1d4ed8;"></i> Участок СМТ
+            <small>ремонты</small>
+        </h1>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a class="bitrix-link" href="https://b24-964ige.bitrix24.ru/" target="_blank">
+                <i class="fas fa-external-link-alt"></i> Битрикс24
+            </a>
+            <button class="btn-request" id="fetchBtnSMT">
+                <i class="fas fa-sync-alt"></i> Запрос
+            </button>
+        </div>
+    </div>
+
+    <div class="flow-block">
+        <button class="alert-legend-btn" id="alertLegendBtnSMT">
+            <i class="fas fa-exclamation-triangle"></i> Красные счётчики
+        </button>
+        <div class="flow-container">
+            <div class="flow-row" id="flowRowSMT"></div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <div class="legend">
+            <span class="legend-item"><span class="legend-dot"></span> стадия</span>
+            <span class="legend-item"><span class="legend-dot green"></span> всего</span>
+            <span class="legend-item"><span class="legend-dot red"></span> проблема</span>
+            <span class="legend-item"><i class="fas fa-mouse-pointer" style="color:#1d4ed8;"></i> клик</span>
+        </div>
+        <div class="webhook-info"><i class="fas fa-cloud-upload-alt"></i> n8n.gmtnsk.ru</div>
+        <div id="statusMessageSMT" class="status-message"><i class="fas fa-info-circle"></i> Нажмите "Запрос"</div>
+    </div>
+
+    <!-- РАЗДЕЛИТЕЛЬ -->
+    <div class="funnel-divider"></div>
+
+    <!-- ================= ВОРОНКА 2: ЗАПЧАСТИ ================= -->
+    <div class="toolbar">
+        <h1>
+            <i class="fas fa-cogs" style="color:#0e7490;"></i> Запчасти
+            <small>воронка</small>
+        </h1>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn-request" id="fetchBtnParts" style="background:#0e7490;">
+                <i class="fas fa-sync-alt"></i> Запрос
+            </button>
+        </div>
+    </div>
+
+    <div class="flow-block">
+        <button class="alert-legend-btn" id="alertLegendBtnParts">
+            <i class="fas fa-exclamation-triangle"></i> Красные счётчики
+        </button>
+        <div class="flow-container">
+            <div class="flow-row" id="flowRowParts"></div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        <div class="legend">
+            <span class="legend-item"><span class="legend-dot"></span> стадия</span>
+            <span class="legend-item"><span class="legend-dot green"></span> всего</span>
+            <span class="legend-item"><span class="legend-dot red"></span> проблема</span>
+            <span class="legend-item"><i class="fas fa-mouse-pointer" style="color:#1d4ed8;"></i> клик</span>
+        </div>
+        <div id="statusMessageParts" class="status-message"><i class="fas fa-info-circle"></i> Нажмите "Запрос"</div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  ОБЩИЕ ФУНКЦИИ
+    // ============================================================
+    const overlay = document.getElementById('dropdownOverlay');
+
+    // Формат ДД.ММ.ГГГГ
+    function formatDateDDMMYYYY(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}.${mm}.${yyyy}`;
+    }
+
+    function closeAllOverlays() {
+        document.querySelectorAll('.stage-dropdown.open').forEach(el => el.classList.remove('open'));
+        document.querySelectorAll('.stage-circle.active').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.alert-info-modal.open').forEach(el => el.classList.remove('open'));
+        overlay.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+
+    overlay.addEventListener('click', closeAllOverlays);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllOverlays(); });
+
+    // ============================================================
+    //  ВОРОНКА 1: УЧАСТОК СМТ
+    // ============================================================
+    (function initSMT() {
+        const STAGE_MAP = {
+            'C12:NEW': 'Новая',
+            'C12:UC_L90PZM': 'Решение о ремонте',
+            'C12:PREPAYMENT_INVOICE': 'Диагностика, ремонт',
+            'C12:UC_9ESR0K': 'Заказаны 3Ч',
+            'C12:UC_L294GC': '3Ч получена',
+            'C12:4': 'Готово',
+            'C12:UC_3M5ZEE': 'На выдачу'
+        };
+        const STAGE_ORDER = Object.keys(STAGE_MAP);
+        const ALERT_STAGES = {
+            'C12:UC_L90PZM': true,
+            'C12:PREPAYMENT_INVOICE': true,
+            'C12:UC_9ESR0K': true,
+            'C12:UC_3M5ZEE': true
+        };
+
+        let dealsData = {}, alertCounts = {}, openDropdown = null, stageElements = {};
+        const flowRow = document.getElementById('flowRowSMT');
+        const statusMsg = document.getElementById('statusMessageSMT');
+        const fetchBtn = document.getElementById('fetchBtnSMT');
+        const alertLegendBtn = document.getElementById('alertLegendBtnSMT');
+        const alertInfoModal = document.getElementById('alertInfoModalSMT');
+        const alertInfoClose = document.getElementById('alertInfoCloseSMT');
+
+        function createStageElements() {
+            flowRow.innerHTML = '';
+            stageElements = {};
+            STAGE_ORDER.forEach((stageId, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'stage-wrapper';
+                wrapper.dataset.stage = stageId;
+                const circle = document.createElement('div');
+                circle.className = 'stage-circle';
+                let badgeHtml = `<span class="count-badge" id="smt-badge-${index}">0</span>`;
+                if (ALERT_STAGES[stageId]) badgeHtml += `<span class="alert-badge" id="smt-alert-${index}" style="display:none">0</span>`;
+                circle.innerHTML = `<span>${index + 1}</span>${badgeHtml}`;
+                const label = document.createElement('div');
+                label.className = 'stage-label';
+                label.textContent = STAGE_MAP[stageId];
+                const dropdown = document.createElement('div');
+                dropdown.className = 'stage-dropdown';
+                dropdown.innerHTML = `<div class="dropdown-header"><h3>${STAGE_MAP[stageId]}</h3><button class="dropdown-close">&times;</button></div><div class="dropdown-content"></div>`;
+                wrapper.appendChild(circle); wrapper.appendChild(label); wrapper.appendChild(dropdown);
+                flowRow.appendChild(wrapper);
+
+                stageElements[stageId] = {
+                    wrapper, circle, dropdown,
+                    content: dropdown.querySelector('.dropdown-content'),
+                    badge: document.getElementById(`smt-badge-${index}`),
+                    alertBadge: ALERT_STAGES[stageId] ? document.getElementById(`smt-alert-${index}`) : null,
+                    closeBtn: dropdown.querySelector('.dropdown-close')
+                };
+                circle.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(stageId); });
+                stageElements[stageId].closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeDropdown(); });
+                dropdown.addEventListener('click', (e) => { if (e.target.closest('a')) return; e.stopPropagation(); });
+            });
+        }
+
+        function toggleDropdown(stageId) {
+            const el = stageElements[stageId]; if (!el) return;
+            if (openDropdown === stageId) { closeDropdown(); return; }
+            closeDropdown();
+            el.dropdown.classList.add('open'); el.circle.classList.add('active');
+            overlay.classList.add('active'); document.body.classList.add('modal-open');
+            openDropdown = stageId; renderDropdownContent(stageId);
+        }
+        function closeDropdown() {
+            if (!openDropdown) return;
+            const el = stageElements[openDropdown];
+            if (el) { el.dropdown.classList.remove('open'); el.circle.classList.remove('active'); }
+            openDropdown = null; overlay.classList.remove('active');
+            if (!document.getElementById('alertInfoModalSMT').classList.contains('open') &&
+                !document.getElementById('alertInfoModalParts').classList.contains('open'))
+                document.body.classList.remove('modal-open');
+        }
+        function renderDropdownContent(stageId) {
+            const el = stageElements[stageId]; if (!el) return;
+            const deals = dealsData[stageId] || [];
+            if (deals.length === 0) { el.content.innerHTML = `<div class="empty-message">Нет сделок</div>`; return; }
+            let html = '';
+            deals.forEach(deal => {
+                const url = `https://b24-964ige.bitrix24.ru/crm/deal/show/${deal.ID}/`;
+                const alertIcon = deal._isAlert ? `<i class="fas fa-exclamation-circle deal-alert-icon"></i>` : `<span style="width:16px;display:inline-block"></span>`;
+                let titleText = deal.TITLE;
+                if (deal.UF_EXTRA && String(deal.UF_EXTRA).trim() !== '') titleText += ` <span class="deal-uf-field">(${deal.UF_EXTRA})</span>`;
+                html += `<div class="deal-item">${alertIcon}<a href="${url}" target="_blank" class="deal-title-link">${titleText}</a></div>`;
+            });
+            el.content.innerHTML = html;
+        }
+        function checkAlertCondition(deal, stageId) {
+            const now = new Date();
+            const moscowOffset = 3 * 60 * 60 * 1000;
+            const nowMoscow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + moscowOffset);
+            function daysSince(dateStr) {
+                if (!dateStr) return null;
+                const d = new Date(dateStr); if (isNaN(d.getTime())) return null;
+                const dMoscow = new Date(d.getTime() + (d.getTimezoneOffset() * 60000) + moscowOffset);
+                return (nowMoscow - dMoscow) / (1000 * 60 * 60 * 24);
+            }
+            if (stageId === 'C12:UC_L90PZM') return daysSince(deal.BEGINDATE) > 3;
+            if (stageId === 'C12:PREPAYMENT_INVOICE') { const v = parseInt(deal.UF_CRM_1785307987, 10); return !isNaN(v) && v > 9; }
+            if (stageId === 'C12:UC_9ESR0K') return daysSince(deal.BEGINDATE) > 30;
+            if (stageId === 'C12:UC_3M5ZEE') return daysSince(deal.UF_CRM_1755597807) > 15;
+            return false;
+        }
+        function updateStages(countsMap, dealsMap) {
+            dealsData = dealsMap || {}; alertCounts = {}; let totalDeals = 0;
+            STAGE_ORDER.forEach(stageId => {
+                const count = countsMap[stageId] || 0; totalDeals += count;
+                const el = stageElements[stageId];
+                if (el) {
+                    el.badge.textContent = count;
+                    if (el.alertBadge) {
+                        const alerts = (dealsMap[stageId] || []).filter(d => d._isAlert).length;
+                        alertCounts[stageId] = alerts;
+                        el.alertBadge.style.display = alerts > 0 ? 'block' : 'none';
+                        el.alertBadge.textContent = alerts;
+                    }
+                }
+                if (openDropdown === stageId) renderDropdownContent(stageId);
+            });
+            if (totalDeals === 0) statusMsg.innerHTML = `<i class="fas fa-database"></i> Нет сделок (0)`;
+            else {
+                const totalAlerts = Object.values(alertCounts).reduce((a,b)=>a+b, 0);
+                const alertText = totalAlerts > 0 ? ` (<b style="color:#ef4444">${totalAlerts} проблемных</b>)` : '';
+                statusMsg.innerHTML = `<i class="fas fa-check-circle" style="color:#22c55e;"></i> Загружено: ${totalDeals}${alertText}`;
+            }
+        }
+        function parseWebhookResponse(data) {
+            let counts = {}, dealsMap = {};
+            STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
+            let dealsArray = null;
+            if (Array.isArray(data) && data.length > 0 && data[0].deals && Array.isArray(data[0].deals)) dealsArray = data[0].deals;
+            else if (data.deals && Array.isArray(data.deals)) dealsArray = data.deals;
+            else if (Array.isArray(data) && data.length > 0 && data[0].STAGE_ID) dealsArray = data;
+            if (dealsArray) {
+                const uniqueDeals = new Map();
+                dealsArray.forEach(deal => {
+                    if (uniqueDeals.has(deal.ID)) return;
+                    const stageId = deal.STAGE_ID;
+                    if (stageId && STAGE_MAP.hasOwnProperty(stageId)) {
+                        uniqueDeals.set(deal.ID, stageId);
+                        counts[stageId]++;
+                        let title = deal.TITLE || deal.NAME || `Сделка №${deal.ID}`;
+                        const isAlert = checkAlertCondition(deal, stageId);
+                        dealsMap[stageId].push({
+                            ID: deal.ID, TITLE: title, STAGE_ID: stageId,
+                            BEGINDATE: deal.BEGINDATE,
+                            UF_CRM_1785307987: deal.UF_CRM_1785307987,
+                            UF_CRM_1755597807: deal.UF_CRM_1755597807,
+                            UF_EXTRA: deal.UF_CRM_1595995680751,
+                            _isAlert: isAlert
+                        });
+                    }
+                });
+            }
+            return { counts, dealsMap };
+        }
+        async function fetchRepairData() {
+            const url = 'https://n8n.gmtnsk.ru/webhook/be75ff19-3f4e-478e-b6d7-661f037f2626';
+            fetchBtn.disabled = true; fetchBtn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i>`;
+            statusMsg.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Загрузка...`;
+            try {
+                const r = await fetch(url, { method:'POST', mode:'cors', cache:'no-cache',
+                    headers:{'Accept':'application/json','Content-Type':'application/json'},
+                    body: JSON.stringify({ action:'get_status', timestamp:new Date().toISOString(), source:'smt_dashboard' })});
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const data = await r.json();
+                const { counts, dealsMap } = parseWebhookResponse(data);
+                const total = Object.values(counts).reduce((a,b)=>a+b, 0);
+                if (total === 0) {
+                    statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#b91c1c;"></i> Пусто`;
+                    STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
+                }
+                updateStages(counts, dealsMap);
+            } catch (e) {
+                console.error(e);
+                statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#b91c1c;"></i> Ошибка`;
+                STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
+                updateStages({}, {});
+            } finally {
+                fetchBtn.disabled = false; fetchBtn.innerHTML = `<i class="fas fa-sync-alt"></i> Запрос`;
+            }
+        }
+        function openAlertInfoModal() {
+            alertInfoModal.classList.add('open'); overlay.classList.add('active'); document.body.classList.add('modal-open');
+        }
+        function closeAlertInfoModal() {
+            alertInfoModal.classList.remove('open');
+            if (!openDropdown) { overlay.classList.remove('active'); document.body.classList.remove('modal-open'); }
+        }
+        alertLegendBtn.addEventListener('click', (e) => { e.stopPropagation(); openAlertInfoModal(); });
+        alertInfoClose.addEventListener('click', (e) => { e.stopPropagation(); closeAlertInfoModal(); });
+        fetchBtn.addEventListener('click', fetchRepairData);
+        createStageElements();
+        STAGE_ORDER.forEach(id => { stageElements[id].badge.textContent = '0'; if (stageElements[id].alertBadge) stageElements[id].alertBadge.style.display = 'none'; });
+        statusMsg.innerHTML = `<i class="fas fa-info-circle"></i> Нажмите "Запрос"`;
+    })();
+
+    // ============================================================
+    //  ВОРОНКА 2: ЗАПЧАСТИ
+    // ============================================================
+    (function initParts() {
+        const STAGE_MAP = {
+            'C2:NEW':                'Вход',
+            'C2:PREPARATION':        'Запрос счёта',
+            'C2:PREPAYMENT_INVOICE': 'Зона ответственности',
+            'C2:FINAL_INVOICE':      'Оплачено',
+            'C2:1':                  'Товар на складе'
+        };
+        const STAGE_ORDER = Object.keys(STAGE_MAP);
+        const ALERT_STAGES = { 'C2:PREPARATION': true };
+
+        let dealsData = {}, alertCounts = {}, openDropdown = null, stageElements = {};
+        const flowRow = document.getElementById('flowRowParts');
+        const statusMsg = document.getElementById('statusMessageParts');
+        const fetchBtn = document.getElementById('fetchBtnParts');
+        const alertLegendBtn = document.getElementById('alertLegendBtnParts');
+        const alertInfoModal = document.getElementById('alertInfoModalParts');
+        const alertInfoClose = document.getElementById('alertInfoCloseParts');
+
+        function createStageElements() {
+            flowRow.innerHTML = ''; stageElements = {};
+            STAGE_ORDER.forEach((stageId, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'stage-wrapper';
+                wrapper.dataset.stage = stageId;
+                const circle = document.createElement('div');
+                circle.className = 'stage-circle';
+                let badgeHtml = `<span class="count-badge" id="parts-badge-${index}">0</span>`;
+                if (ALERT_STAGES[stageId]) badgeHtml += `<span class="alert-badge" id="parts-alert-${index}" style="display:none">0</span>`;
+                circle.innerHTML = `<span>${index + 1}</span>${badgeHtml}`;
+                const label = document.createElement('div');
+                label.className = 'stage-label';
+                label.textContent = STAGE_MAP[stageId];
+                const dropdown = document.createElement('div');
+                dropdown.className = 'stage-dropdown';
+                dropdown.innerHTML = `<div class="dropdown-header"><h3>${STAGE_MAP[stageId]}</h3><button class="dropdown-close">&times;</button></div><div class="dropdown-content"></div>`;
+                wrapper.appendChild(circle); wrapper.appendChild(label); wrapper.appendChild(dropdown);
+                flowRow.appendChild(wrapper);
+
+                stageElements[stageId] = {
+                    wrapper, circle, dropdown,
+                    content: dropdown.querySelector('.dropdown-content'),
+                    badge: document.getElementById(`parts-badge-${index}`),
+                    alertBadge: ALERT_STAGES[stageId] ? document.getElementById(`parts-alert-${index}`) : null,
+                    closeBtn: dropdown.querySelector('.dropdown-close')
+                };
+                circle.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(stageId); });
+                stageElements[stageId].closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeDropdown(); });
+                dropdown.addEventListener('click', (e) => { if (e.target.closest('a')) return; e.stopPropagation(); });
+            });
+        }
+
+        function toggleDropdown(stageId) {
+            const el = stageElements[stageId]; if (!el) return;
+            if (openDropdown === stageId) { closeDropdown(); return; }
+            closeDropdown();
+            el.dropdown.classList.add('open'); el.circle.classList.add('active');
+            overlay.classList.add('active'); document.body.classList.add('modal-open');
+            openDropdown = stageId; renderDropdownContent(stageId);
+        }
+        function closeDropdown() {
+            if (!openDropdown) return;
+            const el = stageElements[openDropdown];
+            if (el) { el.dropdown.classList.remove('open'); el.circle.classList.remove('active'); }
+            openDropdown = null; overlay.classList.remove('active');
+            if (!document.getElementById('alertInfoModalSMT').classList.contains('open') &&
+                !document.getElementById('alertInfoModalParts').classList.contains('open'))
+                document.body.classList.remove('modal-open');
+        }
+
+        // Формат: №42290 Прокладка парогенератора Колыванская ЦРБ 24.08.2026
+        // Ведущий номер из TITLE удаляется, чтобы не было дубля с №{ID}
+        function renderDropdownContent(stageId) {
+            const el = stageElements[stageId]; if (!el) return;
+            const deals = dealsData[stageId] || [];
+            if (deals.length === 0) { el.content.innerHTML = `<div class="empty-message">Нет сделок</div>`; return; }
+            let html = '';
+            deals.forEach(deal => {
+                const url = `https://b24-964ige.bitrix24.ru/crm/deal/show/${deal.ID}/`;
+                const alertIcon = deal._isAlert ? `<i class="fas fa-exclamation-circle deal-alert-icon"></i>` : `<span style="width:16px;display:inline-block"></span>`;
+
+                const parts = [];
+                parts.push(`№${deal.ID}`);
+
+                // Убираем ведущий номер из TITLE, если он совпадает с ID
+                let title = deal.TITLE || '';
+                const idPattern = new RegExp(`^№?\\s*${deal.ID}\\s*`);
+                title = title.replace(idPattern, '').trim();
+                if (title) parts.push(title);
+
+                if (deal.UF_EXTRA) parts.push(deal.UF_EXTRA);
+                if (deal.BEGINDATE_FORMATTED) parts.push(deal.BEGINDATE_FORMATTED);
+
+                const titleText = parts.join(' ');
+                html += `<div class="deal-item">${alertIcon}<a href="${url}" target="_blank" class="deal-title-link">${titleText}</a></div>`;
+            });
+            el.content.innerHTML = html;
+        }
+
+        function checkAlertCondition(deal, stageId) {
+            if (stageId !== 'C2:PREPARATION') return false;
+            const now = new Date();
+            const moscowOffset = 3 * 60 * 60 * 1000;
+            const nowMoscow = new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + moscowOffset);
+            const d = new Date(deal.BEGINDATE);
+            if (isNaN(d.getTime())) return false;
+            const dMoscow = new Date(d.getTime() + (d.getTimezoneOffset() * 60000) + moscowOffset);
+            const days = (nowMoscow - dMoscow) / (1000 * 60 * 60 * 24);
+            return days > 10;
+        }
+
+        function updateStages(countsMap, dealsMap) {
+            dealsData = dealsMap || {}; alertCounts = {}; let totalDeals = 0;
+            STAGE_ORDER.forEach(stageId => {
+                const count = countsMap[stageId] || 0; totalDeals += count;
+                const el = stageElements[stageId];
+                if (el) {
+                    el.badge.textContent = count;
+                    if (el.alertBadge) {
+                        const alerts = (dealsMap[stageId] || []).filter(d => d._isAlert).length;
+                        alertCounts[stageId] = alerts;
+                        el.alertBadge.style.display = alerts > 0 ? 'block' : 'none';
+                        el.alertBadge.textContent = alerts;
+                    }
+                }
+                if (openDropdown === stageId) renderDropdownContent(stageId);
+            });
+            if (totalDeals === 0) statusMsg.innerHTML = `<i class="fas fa-database"></i> Нет сделок (0)`;
+            else {
+                const totalAlerts = Object.values(alertCounts).reduce((a,b)=>a+b, 0);
+                const alertText = totalAlerts > 0 ? ` (<b style="color:#ef4444">${totalAlerts} проблемных</b>)` : '';
+                statusMsg.innerHTML = `<i class="fas fa-check-circle" style="color:#22c55e;"></i> Загружено: ${totalDeals}${alertText}`;
+            }
+        }
+
+        function parseWebhookResponse(data) {
+            let counts = {}, dealsMap = {};
+            STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
+            let dealsArray = null;
+            if (Array.isArray(data) && data.length > 0 && data[0].deals && Array.isArray(data[0].deals)) dealsArray = data[0].deals;
+            else if (data.deals && Array.isArray(data.deals)) dealsArray = data.deals;
+            else if (Array.isArray(data) && data.length > 0 && data[0].STAGE_ID) dealsArray = data;
+            if (dealsArray) {
+                const uniqueDeals = new Map();
+                dealsArray.forEach(deal => {
+                    if (uniqueDeals.has(deal.ID)) return;
+                    const stageId = deal.STAGE_ID;
+                    if (stageId && STAGE_MAP.hasOwnProperty(stageId)) {
+                        uniqueDeals.set(deal.ID, stageId);
+                        counts[stageId]++;
+                        let title = deal.TITLE || deal.NAME || `Сделка №${deal.ID}`;
+                        const isAlert = checkAlertCondition(deal, stageId);
+                        dealsMap[stageId].push({
+                            ID: deal.ID,
+                            TITLE: title,
+                            STAGE_ID: stageId,
+                            BEGINDATE: deal.BEGINDATE,
+                            BEGINDATE_FORMATTED: formatDateDDMMYYYY(deal.BEGINDATE),
+                            UF_EXTRA: deal.UF_CRM_1588570723112,
+                            _isAlert: isAlert
+                        });
+                    }
+                });
+            }
+            return { counts, dealsMap };
+        }
+
+        async function fetchPartsData() {
+            const url = 'https://n8n.gmtnsk.ru/webhook/765d75ac-7da2-4985-99c0-85effe364090';
+            fetchBtn.disabled = true; fetchBtn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i>`;
+            statusMsg.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Загрузка...`;
+            try {
+                const r = await fetch(url, { method:'POST', mode:'cors', cache:'no-cache',
+                    headers:{'Accept':'application/json','Content-Type':'application/json'},
+                    body: JSON.stringify({ action:'get_status', timestamp:new Date().toISOString(), source:'parts_dashboard' })});
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                const data = await r.json();
+                const { counts, dealsMap } = parseWebhookResponse(data);
+                const total = Object.values(counts).reduce((a,b)=>a+b, 0);
+                if (total === 0) {
+                    statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#b91c1c;"></i> Пусто`;
+                    STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
+                }
+                updateStages(counts, dealsMap);
+            } catch (e) {
+                console.error(e);
+                statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#b91c1c;"></i> Ошибка`;
+                STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
+                updateStages({}, {});
+            } finally {
+                fetchBtn.disabled = false; fetchBtn.innerHTML = `<i class="fas fa-sync-alt"></i> Запрос`;
+            }
+        }
+
+        function openAlertInfoModal() {
+            alertInfoModal.classList.add('open'); overlay.classList.add('active'); document.body.classList.add('modal-open');
+        }
+        function closeAlertInfoModal() {
+            alertInfoModal.classList.remove('open');
+            if (!openDropdown) { overlay.classList.remove('active'); document.body.classList.remove('modal-open'); }
+        }
+
+        alertLegendBtn.addEventListener('click', (e) => { e.stopPropagation(); openAlertInfoModal(); });
+        alertInfoClose.addEventListener('click', (e) => { e.stopPropagation(); closeAlertInfoModal(); });
+        fetchBtn.addEventListener('click', fetchPartsData);
+
+        createStageElements();
+        STAGE_ORDER.forEach(id => { stageElements[id].badge.textContent = '0'; if (stageElements[id].alertBadge) stageElements[id].alertBadge.style.display = 'none'; });
+        statusMsg.innerHTML = `<i class="fas fa-info-circle"></i> Нажмите "Запрос"`;
+    })();
+</script>
+
+</body>
+</html>
