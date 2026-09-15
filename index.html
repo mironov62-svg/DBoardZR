@@ -12,6 +12,36 @@
         h1 { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 20px; color: #0b1e3a; margin-bottom: 0; }
         h1 small { font-weight: 400; font-size: 14px; color: #5a6d86; margin-left: 4px; }
         .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px; border-bottom: 1px solid #e6edf5; padding-bottom: 8px; }
+        
+        /* Стильная кнопка "Мониторинг УСМТ" */
+        .btn-monitoring {
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.35);
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .btn-monitoring i { font-size: 13px; }
+        .btn-monitoring:hover {
+            background: linear-gradient(135deg, #1744c0, #2563eb);
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.45);
+            transform: translateY(-2px);
+        }
+        .btn-monitoring:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(29, 78, 216, 0.3);
+        }
+
         .bitrix-link { background: #f0f4fe; padding: 5px 12px; border-radius: 20px; font-size: 12px; color: #1d4ed8; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.15s; }
         .bitrix-link i { font-size: 12px; }
         .bitrix-link:hover { background: #e2eaff; color: #0f3bb3; }
@@ -145,11 +175,11 @@
     <h3><i class="fas fa-exclamation-triangle"></i> Пояснения по красным счётчикам (Запчасти)</h3>
     <div class="info-row">
         <div class="info-stage">Запрос счёта</div>
-        <div class="info-desc">Более <span class="info-days">10 дней</span> с даты начала (BEGINDATE).</div>
+        <div class="info-desc">Более <span class="info-days">10 дней</span> с даты начала.</div>
     </div>
     <div class="info-row">
         <div class="info-stage">Оплачено</div>
-        <div class="info-desc">Более <span class="info-days">20 дней</span> с даты фиксации 1.</div>
+        <div class="info-desc">Более <span class="info-days">20 дней</span> с даты прихода на стадию.</div>
     </div>
 </div>
 
@@ -161,6 +191,9 @@
             <small>ремонты</small>
         </h1>
         <div style="display: flex; gap: 8px; align-items: center;">
+            <a class="btn-monitoring" href="https://mironov62-svg.github.io/Monitor/" target="_blank">
+                <i class="fas fa-chart-line"></i> Мониторинг УСМТ
+            </a>
             <a class="bitrix-link" href="https://b24-964ige.bitrix24.ru/" target="_blank">
                 <i class="fas fa-external-link-alt"></i> Битрикс24
             </a>
