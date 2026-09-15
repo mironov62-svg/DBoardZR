@@ -7,24 +7,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; margin: 0; padding: 0; }
-        body { background: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 0; overflow-y: auto; }
-        .card { max-width: 1400px; width: 100%; background: transparent; display: block; height: auto !important; min-height: 0 !important; overflow: visible; padding: 15px 20px; }
-        h1 { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 20px; color: #0b1e3a; margin-bottom: 0; }
-        h1 small { font-weight: 400; font-size: 14px; color: #5a6d86; margin-left: 4px; }
-        .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 12px; border-bottom: 1px solid #e6edf5; padding-bottom: 8px; }
         
-        /* Стильная кнопка "Мониторинг УСМТ" */
+        html, body {
+            background: #0a0e1a !important;
+            color: #e2e8f0 !important;
+            min-height: 100vh;
+        }
+        body {
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.10) 0%, transparent 45%),
+                radial-gradient(circle at 85% 90%, rgba(34, 197, 94, 0.07) 0%, transparent 45%) !important;
+            background-attachment: fixed !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0;
+            overflow-y: auto;
+        }
+        
+        .card {
+            max-width: 1400px;
+            width: 100%;
+            background: transparent !important;
+            display: block;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible;
+            padding: 20px 25px;
+        }
+        
+        h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 20px;
+            color: #f1f5f9 !important;
+            margin-bottom: 0;
+            letter-spacing: -0.3px;
+        }
+        h1 small {
+            font-weight: 400;
+            font-size: 14px;
+            color: #64748b !important;
+            margin-left: 4px;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+            padding-bottom: 12px;
+        }
+        
         .btn-monitoring {
-            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
             border: none;
-            color: white;
+            color: #fff !important;
             font-weight: 600;
             font-size: 13px;
-            padding: 6px 16px;
+            padding: 7px 18px;
             border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.35);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -33,111 +83,570 @@
         }
         .btn-monitoring i { font-size: 13px; }
         .btn-monitoring:hover {
-            background: linear-gradient(135deg, #1744c0, #2563eb);
-            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.45);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.75);
             transform: translateY(-2px);
         }
-        .btn-monitoring:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(29, 78, 216, 0.3);
+        .btn-monitoring:active { transform: translateY(0); }
+        
+        .bitrix-link {
+            background: rgba(59, 130, 246, 0.12) !important;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #60a5fa !important;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+            border: 1px solid rgba(59, 130, 246, 0.25);
         }
-
-        .bitrix-link { background: #f0f4fe; padding: 5px 12px; border-radius: 20px; font-size: 12px; color: #1d4ed8; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.15s; }
         .bitrix-link i { font-size: 12px; }
-        .bitrix-link:hover { background: #e2eaff; color: #0f3bb3; }
-        .btn-request { background: #1d4ed8; border: none; color: white; font-weight: 600; font-size: 13px; padding: 6px 16px; border-radius: 20px; box-shadow: 0 2px 5px rgba(29,78,216,0.2); cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .bitrix-link:hover {
+            background: rgba(59, 130, 246, 0.25) !important;
+            color: #93c5fd !important;
+            border-color: rgba(59, 130, 246, 0.55);
+        }
+        
+        .btn-request {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border: none;
+            color: #fff !important;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 7px 18px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            cursor: pointer;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
         .btn-request i { font-size: 13px; }
-        .btn-request:hover { background: #1744c0; transform: translateY(-1px); }
+        .btn-request:hover {
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.75);
+            transform: translateY(-2px);
+        }
         .btn-request:active { transform: translateY(0); }
-        .btn-request:disabled { opacity: 0.6; pointer-events: none; }
-
+        .btn-request:disabled { opacity: 0.5; pointer-events: none; }
+        
         .flow-block { display: flex; align-items: flex-start; gap: 18px; width: 100%; }
-        .alert-legend-btn { flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; margin-top: 20px; padding: 8px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 20px; color: #b91c1c; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.15s; white-space: nowrap; user-select: none; }
-        .alert-legend-btn i { font-size: 13px; }
-        .alert-legend-btn:hover { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
-        .alert-legend-btn:active { transform: scale(0.97); }
-        .flow-container { margin: 0; overflow-x: auto; overflow-y: visible; padding: 8px 0 10px; flex: 1; min-width: 0; }
-        .flow-row { display: flex; align-items: flex-start; justify-content: center; position: relative; gap: 40px; width: 100%; overflow: visible; min-width: fit-content; }
-
-        .stage-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; width: 70px; cursor: pointer; flex-shrink: 0; overflow: visible; }
-        .stage-wrapper:not(:last-child)::after { content: ''; position: absolute; top: 35px; left: 70px; width: 40px; height: 2px; background: #1d4ed8; z-index: 0; }
-
-        .stage-circle { position: relative; width: 70px; height: 70px; border-radius: 50%; background: white; border: 3px solid #1d4ed8; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 22px; color: #1d4ed8; z-index: 2; box-shadow: 0 0 0 6px white; transition: all 0.2s; cursor: pointer; flex-shrink: 0; }
-        .stage-circle:hover { transform: scale(1.05); box-shadow: 0 0 0 6px white, 0 4px 15px rgba(29,78,216,0.2); }
-        .stage-circle.active { border-color: #22c55e; background: #f0faf4; }
-
-        .stage-circle .count-badge { position: absolute; top: -8px; right: -8px; background: #22c55e; color: white; font-size: 13px; font-weight: 700; padding: 2px 8px; border-radius: 30px; min-width: 26px; text-align: center; box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3); border: 2px solid white; line-height: 1.3; z-index: 3; }
-        .stage-circle .alert-badge { position: absolute; top: auto; bottom: -8px; right: -8px; background: #ef4444; color: white; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 20px; min-width: 20px; text-align: center; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4); border: 2px solid white; line-height: 1.2; z-index: 4; animation: pulse-red 2s infinite; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-
-        .stage-label { font-size: 12px; font-weight: 500; color: #1e2f4a; text-align: center; line-height: 1.2; margin-top: 8px; width: 100%; min-height: 28px; display: flex; align-items: flex-start; justify-content: center; }
-
-        .stage-dropdown { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 1px solid #e6edf5; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); padding: 12px 16px; min-width: 400px; max-width: 80vw; max-height: 70vh; overflow-y: auto; z-index: 1000; text-align: left; }
+        
+        /* ============================================================
+           КНОПКА "ТАЙМИНГИ" — СТЕКЛЯННАЯ ПИЛЮЛЯ
+           ============================================================ */
+        .alert-legend-btn {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 22px;
+            padding: 9px 18px;
+            background: rgba(148, 163, 184, 0.08) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(203, 213, 225, 0.18);
+            border-radius: 20px;
+            color: #e2e8f0 !important;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            user-select: none;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        .alert-legend-btn i { 
+            font-size: 13px; 
+            opacity: 0.9;
+        }
+        .alert-legend-btn:hover {
+            background: rgba(148, 163, 184, 0.14) !important;
+            border-color: rgba(203, 213, 225, 0.4);
+            color: #fff !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 25px rgba(148, 163, 184, 0.25);
+        }
+        .alert-legend-btn:active { 
+            transform: scale(0.98); 
+        }
+        
+        .flow-container {
+            margin: 0;
+            overflow-x: auto;
+            overflow-y: visible;
+            padding: 10px 0 15px;
+            flex: 1;
+            min-width: 0;
+        }
+        .flow-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            gap: 40px;
+            width: 100%;
+            overflow: visible;
+            min-width: fit-content;
+        }
+        
+        .stage-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 80px;
+            cursor: pointer;
+            flex-shrink: 0;
+            overflow: visible;
+            transition: transform 0.3s ease;
+        }
+        .stage-wrapper:hover { transform: translateY(-6px); }
+        .stage-wrapper:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 80px;
+            width: 40px;
+            height: 2px;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(59, 130, 246, 0.6) 0px,
+                rgba(59, 130, 246, 0.6) 6px,
+                transparent 6px,
+                transparent 12px
+            );
+            background-size: 12px 2px;
+            animation: flowLine 1s linear infinite;
+            z-index: 0;
+        }
+        @keyframes flowLine {
+            0% { background-position: 0 0; }
+            100% { background-position: 12px 0; }
+        }
+        
+        .stage-circle {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #131a2b, #0d1220) !important;
+            border: 2px solid rgba(59, 130, 246, 0.55) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 24px;
+            color: #60a5fa !important;
+            z-index: 2;
+            box-shadow:
+                0 0 0 6px #0a0e1a,
+                0 0 20px rgba(59, 130, 246, 0.18),
+                inset 0 2px 10px rgba(59, 130, 246, 0.12);
+            transition: box-shadow 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .stage-wrapper:hover .stage-circle {
+            border-color: #60a5fa !important;
+            box-shadow:
+                0 0 0 6px #0a0e1a,
+                0 0 30px rgba(59, 130, 246, 0.55),
+                inset 0 2px 15px rgba(59, 130, 246, 0.25);
+            color: #93c5fd !important;
+        }
+        .stage-circle.active {
+            border-color: #22c55e !important;
+            background: linear-gradient(145deg, #0d2a1c, #081a12) !important;
+            color: #4ade80 !important;
+            box-shadow:
+                0 0 0 6px #0a0e1a,
+                0 0 35px rgba(34, 197, 94, 0.65),
+                inset 0 2px 15px rgba(34, 197, 94, 0.2);
+        }
+        
+        .stage-circle .count-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+            color: #fff !important;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 30px;
+            min-width: 28px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.65);
+            border: 2px solid #0a0e1a !important;
+            line-height: 1.3;
+            z-index: 3;
+        }
+        
+        .stage-circle .alert-badge {
+            position: absolute;
+            top: auto;
+            bottom: -10px;
+            right: -10px;
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            color: #fff !important;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 20px;
+            min-width: 22px;
+            text-align: center;
+            border: 2px solid #0a0e1a !important;
+            line-height: 1.2;
+            z-index: 4;
+            animation: pulse-red 2s ease-in-out infinite;
+            will-change: opacity, filter;
+        }
+        @keyframes pulse-red {
+            0%   { opacity: 1;    filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.75)); }
+            50%  { opacity: 0.85; filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.95)); }
+            100% { opacity: 1;    filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.75)); }
+        }
+        
+        .stage-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #94a3b8 !important;
+            text-align: center;
+            line-height: 1.3;
+            margin-top: 12px;
+            width: 100%;
+            min-height: 30px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            transition: color 0.25s ease;
+        }
+        .stage-wrapper:hover .stage-label { color: #e2e8f0 !important; }
+        
+        .stage-dropdown {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(0);
+            background: linear-gradient(145deg, #131a2b, #0d1220) !important;
+            border: 1px solid rgba(59, 130, 246, 0.35) !important;
+            border-radius: 16px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.75),
+                0 0 40px rgba(59, 130, 246, 0.22);
+            padding: 16px 20px;
+            min-width: 440px;
+            max-width: 80vw;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 1000;
+            text-align: left;
+            color: #e2e8f0 !important;
+            will-change: opacity;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            isolation: isolate;
+        }
         .stage-dropdown.open { display: block; }
-        .stage-dropdown .dropdown-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 2px solid #1d4ed8; }
-        .stage-dropdown .dropdown-header h3 { font-size: 16px; color: #0b1e3a; margin: 0; }
-        .stage-dropdown .dropdown-close { background: none; border: none; font-size: 20px; color: #7a8aa0; cursor: pointer; padding: 0 5px; }
-        .stage-dropdown .dropdown-close:hover { color: #1d4ed8; }
-
-        .stage-dropdown .deal-item { padding: 8px 0; border-bottom: 1px solid #f0f4fe; display: flex; align-items: center; gap: 10px; }
-        .stage-dropdown .deal-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .stage-dropdown .deal-alert-icon { color: #ef4444; font-size: 14px; min-width: 16px; text-align: center; }
-        .stage-dropdown .deal-title-link { flex: 1; color: #1e2f4a; font-size: 14px; font-weight: 500; text-decoration: none; display: block; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .stage-dropdown .deal-title-link:hover { color: #1d4ed8; text-decoration: underline; }
-        .stage-dropdown .empty-message { color: #7a8aa0; font-size: 13px; text-align: center; padding: 15px 0; }
-
-        /* Цвета для ID и даты в списке сделок */
-        .stage-dropdown .deal-id { color: #1d4ed8; font-weight: 700; }
-        .stage-dropdown .deal-date { color: #16a34a; font-weight: 600; }
-
-        .dropdown-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.3); z-index: 999; }
+        .stage-dropdown .dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.35);
+        }
+        .stage-dropdown .dropdown-header h3 {
+            font-size: 16px;
+            color: #f1f5f9 !important;
+            margin: 0;
+            font-weight: 600;
+        }
+        .stage-dropdown .dropdown-close {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: none;
+            font-size: 18px;
+            color: #94a3b8 !important;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, color 0.2s;
+            line-height: 1;
+        }
+        .stage-dropdown .dropdown-close:hover {
+            color: #f87171 !important;
+            background: rgba(239, 68, 68, 0.18) !important;
+        }
+        
+        .stage-dropdown .deal-item {
+            padding: 10px 6px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+            border-radius: 6px;
+        }
+        .stage-dropdown .deal-item:hover { background: rgba(59, 130, 246, 0.07); }
+        .stage-dropdown .deal-item:last-child { border-bottom: none; }
+        
+        .stage-dropdown .deal-alert-icon {
+            color: #f87171 !important;
+            font-size: 14px;
+            min-width: 16px;
+            text-align: center;
+            filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.55));
+        }
+        .stage-dropdown .deal-title-link {
+            flex: 1;
+            color: #cbd5e1 !important;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: block;
+            transition: color 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .stage-dropdown .deal-title-link:hover {
+            color: #60a5fa !important;
+            text-decoration: underline;
+        }
+        .stage-dropdown .empty-message {
+            color: #64748b !important;
+            font-size: 13px;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .stage-dropdown .deal-id { color: #60a5fa !important; font-weight: 700; }
+        .stage-dropdown .deal-date { color: #4ade80 !important; font-weight: 600; }
+        
+        .dropdown-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 999;
+        }
         .dropdown-overlay.active { display: block; }
-
-        .alert-info-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); padding: 22px 26px; min-width: 380px; max-width: 560px; width: 90vw; max-height: 80vh; overflow-y: auto; z-index: 1100; }
+        
+        /* Модалка "Тайминги" */
+        .alert-info-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(0);
+            background: linear-gradient(145deg, #131a2b, #0d1220) !important;
+            border: 1px solid rgba(148, 163, 184, 0.25) !important;
+            border-radius: 16px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.75),
+                0 0 40px rgba(148, 163, 184, 0.12);
+            padding: 24px 28px;
+            min-width: 400px;
+            max-width: 580px;
+            width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1100;
+            color: #e2e8f0 !important;
+            will-change: opacity;
+            backface-visibility: hidden;
+            isolation: isolate;
+        }
         .alert-info-modal.open { display: block; }
-        .alert-info-modal h3 { display: flex; align-items: center; gap: 10px; font-size: 17px; color: #0b1e3a; margin: 0 0 14px 0; padding-bottom: 10px; border-bottom: 2px solid #ef4444; }
-        .alert-info-modal h3 i { color: #ef4444; }
-        .alert-info-modal .alert-info-close { position: absolute; top: 14px; right: 18px; background: none; border: none; font-size: 22px; color: #7a8aa0; cursor: pointer; padding: 0 4px; line-height: 1; }
-        .alert-info-modal .alert-info-close:hover { color: #ef4444; }
-        .alert-info-modal .info-row { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f0f4fe; font-size: 13.5px; line-height: 1.45; }
+        .alert-info-modal h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 17px;
+            color: #f1f5f9 !important;
+            margin: 0 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            font-weight: 600;
+        }
+        .alert-info-modal h3 i {
+            color: #93c5fd !important;
+            filter: drop-shadow(0 0 8px rgba(147, 197, 253, 0.5));
+        }
+        .alert-info-modal .alert-info-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: none;
+            font-size: 18px;
+            color: #94a3b8 !important;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, color 0.2s;
+            line-height: 1;
+        }
+        .alert-info-modal .alert-info-close:hover {
+            color: #f87171 !important;
+            background: rgba(239, 68, 68, 0.18) !important;
+        }
+        .alert-info-modal .info-row {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
         .alert-info-modal .info-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .alert-info-modal .info-row .info-stage { flex-shrink: 0; width: 160px; font-weight: 600; color: #0b1e3a; }
-        .alert-info-modal .info-row .info-desc { color: #3a4a60; }
-        .alert-info-modal .info-row .info-days { display: inline-block; background: #fef2f2; color: #b91c1c; font-weight: 700; font-size: 12px; padding: 1px 8px; border-radius: 12px; margin-left: 4px; border: 1px solid #fecaca; }
-
-        .footer-note { margin-top: 12px; border-top: 1px solid #e6edf5; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; font-size: 12px; color: #5a6d86; position: relative; z-index: 1; }
+        .alert-info-modal .info-row .info-stage {
+            flex-shrink: 0;
+            width: 170px;
+            font-weight: 600;
+            color: #cbd5e1 !important;
+        }
+        .alert-info-modal .info-row .info-desc { color: #94a3b8 !important; }
+        .alert-info-modal .info-row .info-days {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.15) !important;
+            color: #93c5fd !important;
+            font-weight: 700;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-left: 4px;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.22);
+        }
+        
+        .footer-note {
+            margin-top: 14px;
+            border-top: 1px solid rgba(148, 163, 184, 0.12);
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: #64748b !important;
+            position: relative;
+            z-index: 1;
+            gap: 10px;
+        }
         .footer-note .legend { display: flex; gap: 15px; flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; gap: 5px; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 10px; background: #1d4ed8; border: 2px solid #1d4ed8; }
-        .legend-dot.green { background: #22c55e; border-color: #22c55e; }
-        .legend-dot.red { background: #ef4444; border-color: #ef4444; }
-        .webhook-info { font-size: 10px; color: #7a8aa0; background: #f8f9fa; padding: 3px 10px; border-radius: 12px; border: 1px solid #e6edf5; }
-        .status-message { background: #f0f4fe; padding: 4px 12px; border-radius: 12px; color: #1f3b5c; font-size: 12px; border: 1px solid #dbeafe; }
+        .legend-item { display: flex; align-items: center; gap: 5px; color: #94a3b8 !important; }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            background: #60a5fa !important;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.65);
+        }
+        .legend-dot.green {
+            background: #4ade80 !important;
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.65);
+        }
+        .legend-dot.red {
+            background: #f87171 !important;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.65);
+        }
+        .webhook-info {
+            font-size: 10px;
+            color: #64748b !important;
+            background: rgba(59, 130, 246, 0.08) !important;
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.22);
+        }
+        .status-message {
+            background: rgba(59, 130, 246, 0.08) !important;
+            padding: 5px 14px;
+            border-radius: 12px;
+            color: #93c5fd !important;
+            font-size: 12px;
+            border: 1px solid rgba(59, 130, 246, 0.28);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
         .status-message i { margin-right: 4px; }
-
+        
         body.modal-open { overflow: hidden; }
-
-        .funnel-divider { margin: 28px 0 10px; border-top: 2px dashed #dbeafe; width: 100%; }
-
+        
+        .funnel-divider {
+            margin: 32px 0 12px;
+            border-top: 1px dashed rgba(148, 163, 184, 0.18);
+            width: 100%;
+            position: relative;
+        }
+        .funnel-divider::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #3b82f6;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.85);
+        }
+        
+        /* ============================================================
+           ЗАМОРОЗКА АНИМАЦИЙ ПРИ ОТКРЫТОЙ МОДАЛКЕ (лекарство от дребезга)
+           ============================================================ */
+        body.modal-open .stage-wrapper,
+        body.modal-open .stage-wrapper:hover {
+            transform: none !important;
+            transition: none !important;
+        }
+        body.modal-open .stage-circle,
+        body.modal-open .stage-circle .count-badge,
+        body.modal-open .stage-circle .alert-badge,
+        body.modal-open .stage-wrapper:not(:last-child)::after {
+            animation: none !important;
+            transition: none !important;
+        }
+        body.modal-open .alert-legend-btn,
+        body.modal-open .alert-legend-btn:hover {
+            transform: none !important;
+            transition: none !important;
+        }
+        
         @media (max-width: 900px) {
             .flow-row { gap: 25px; }
-            .stage-wrapper:not(:last-child)::after { width: 25px; left: 70px; }
-            .card { padding: 12px 15px; }
-            .stage-dropdown { min-width: 300px; max-width: 90vw; }
-            .alert-legend-btn { font-size: 11px; padding: 6px 10px; margin-top: 16px; }
+            .stage-wrapper:not(:last-child)::after { width: 25px; left: 80px; top: 40px; }
+            .card { padding: 15px 18px; }
+            .stage-dropdown { min-width: 340px; max-width: 90vw; }
+            .alert-legend-btn { font-size: 11px; padding: 7px 14px; margin-top: 18px; }
         }
         @media (max-width: 600px) {
-            .flow-block { flex-direction: column; gap: 6px; }
+            .flow-block { flex-direction: column; gap: 8px; }
             .alert-legend-btn { margin-top: 0; align-self: flex-start; }
-            .flow-row { gap: 15px; flex-wrap: nowrap; }
-            .stage-wrapper:not(:last-child)::after { width: 15px; left: 60px; top: 30px; }
-            .stage-circle { width: 60px; height: 60px; font-size: 18px; box-shadow: 0 0 0 5px white; }
-            .stage-label { font-size: 10px; min-height: 24px; margin-top: 6px; }
-            .stage-wrapper { width: 60px; }
-            .stage-dropdown { min-width: 260px; max-width: 92vw; padding: 10px 12px; }
+            .flow-row { gap: 18px; flex-wrap: nowrap; }
+            .stage-wrapper:not(:last-child)::after { width: 18px; left: 68px; top: 34px; }
+            .stage-circle { width: 68px; height: 68px; font-size: 20px; box-shadow: 0 0 0 5px #0a0e1a, 0 0 15px rgba(59, 130, 246, 0.25); }
+            .stage-label { font-size: 10px; min-height: 26px; margin-top: 8px; }
+            .stage-wrapper { width: 68px; }
+            .stage-dropdown { min-width: 280px; max-width: 92vw; padding: 14px 16px; }
             .stage-dropdown .dropdown-header h3 { font-size: 14px; }
             .stage-dropdown .deal-title-link { white-space: normal; }
-            .alert-info-modal { min-width: 0; padding: 18px 16px; }
+            .alert-info-modal { min-width: 0; padding: 20px 18px; }
             .alert-info-modal .info-row { flex-direction: column; gap: 4px; }
             .alert-info-modal .info-row .info-stage { width: auto; }
         }
@@ -147,10 +656,10 @@
 
 <div class="dropdown-overlay" id="dropdownOverlay"></div>
 
-<!-- Модалка "Красные счётчики" для Участка СМТ -->
+<!-- Модалка "Тайминги" для Участка СМТ -->
 <div class="alert-info-modal" id="alertInfoModalSMT">
     <button class="alert-info-close" id="alertInfoCloseSMT">&times;</button>
-    <h3><i class="fas fa-exclamation-triangle"></i> Пояснения по красным счётчикам (Участок СМТ)</h3>
+    <h3><i class="fas fa-hourglass-half"></i> Тайминги этапов (Участок СМТ)</h3>
     <div class="info-row">
         <div class="info-stage">Решение о ремонте</div>
         <div class="info-desc">Более <span class="info-days">3 дней</span> с даты получения МИ.</div>
@@ -169,10 +678,10 @@
     </div>
 </div>
 
-<!-- Модалка "Красные счётчики" для Запчастей -->
+<!-- Модалка "Тайминги" для Запчастей -->
 <div class="alert-info-modal" id="alertInfoModalParts">
     <button class="alert-info-close" id="alertInfoCloseParts">&times;</button>
-    <h3><i class="fas fa-exclamation-triangle"></i> Пояснения по красным счётчикам (Запчасти)</h3>
+    <h3><i class="fas fa-hourglass-half"></i> Тайминги этапов (Запчасти)</h3>
     <div class="info-row">
         <div class="info-stage">Запрос счёта</div>
         <div class="info-desc">Более <span class="info-days">10 дней</span> с даты начала.</div>
@@ -187,7 +696,7 @@
     <!-- ================= ВОРОНКА 1: УЧАСТОК СМТ ================= -->
     <div class="toolbar">
         <h1>
-            <i class="fas fa-tools" style="color:#1d4ed8;"></i> Участок СМТ
+            <i class="fas fa-tools" style="color:#60a5fa;"></i> Участок СМТ
             <small>ремонты</small>
         </h1>
         <div style="display: flex; gap: 8px; align-items: center;">
@@ -205,7 +714,7 @@
 
     <div class="flow-block">
         <button class="alert-legend-btn" id="alertLegendBtnSMT">
-            <i class="fas fa-exclamation-triangle"></i> Красные счётчики
+            <i class="fas fa-hourglass-half"></i> Тайминги
         </button>
         <div class="flow-container">
             <div class="flow-row" id="flowRowSMT"></div>
@@ -217,7 +726,7 @@
             <span class="legend-item"><span class="legend-dot"></span> стадия</span>
             <span class="legend-item"><span class="legend-dot green"></span> всего</span>
             <span class="legend-item"><span class="legend-dot red"></span> проблема</span>
-            <span class="legend-item"><i class="fas fa-mouse-pointer" style="color:#1d4ed8;"></i> клик</span>
+            <span class="legend-item"><i class="fas fa-mouse-pointer" style="color:#60a5fa;"></i> клик</span>
         </div>
         <div class="webhook-info"><i class="fas fa-cloud-upload-alt"></i> n8n.gmtnsk.ru</div>
         <div id="statusMessageSMT" class="status-message"><i class="fas fa-info-circle"></i> Нажмите "Запрос"</div>
@@ -229,11 +738,11 @@
     <!-- ================= ВОРОНКА 2: ЗАПЧАСТИ ================= -->
     <div class="toolbar">
         <h1>
-            <i class="fas fa-cogs" style="color:#0e7490;"></i> Запчасти
+            <i class="fas fa-cogs" style="color:#22d3ee;"></i> Запчасти
             <small>воронка</small>
         </h1>
         <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="btn-request" id="fetchBtnParts" style="background:#0e7490;">
+            <button class="btn-request" id="fetchBtnParts" style="background: linear-gradient(135deg, #0e7490, #06b6d4); box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);">
                 <i class="fas fa-sync-alt"></i> Запрос
             </button>
         </div>
@@ -241,7 +750,7 @@
 
     <div class="flow-block">
         <button class="alert-legend-btn" id="alertLegendBtnParts">
-            <i class="fas fa-exclamation-triangle"></i> Красные счётчики
+            <i class="fas fa-hourglass-half"></i> Тайминги
         </button>
         <div class="flow-container">
             <div class="flow-row" id="flowRowParts"></div>
@@ -253,7 +762,7 @@
             <span class="legend-item"><span class="legend-dot"></span> стадия</span>
             <span class="legend-item"><span class="legend-dot green"></span> всего</span>
             <span class="legend-item"><span class="legend-dot red"></span> проблема</span>
-            <span class="legend-item"><i class="fas fa-mouse-pointer" style="color:#1d4ed8;"></i> клик</span>
+            <span class="legend-item"><i class="fas fa-mouse-pointer" style="color:#60a5fa;"></i> клик</span>
         </div>
         <div id="statusMessageParts" class="status-message"><i class="fas fa-info-circle"></i> Нажмите "Запрос"</div>
     </div>
@@ -427,8 +936,8 @@
             if (totalDeals === 0) statusMsg.innerHTML = `<i class="fas fa-database"></i> Нет сделок (0)`;
             else {
                 const totalAlerts = Object.values(alertCounts).reduce((a,b)=>a+b, 0);
-                const alertText = totalAlerts > 0 ? ` (<b style="color:#ef4444">${totalAlerts} проблемных</b>)` : '';
-                statusMsg.innerHTML = `<i class="fas fa-check-circle" style="color:#22c55e;"></i> Загружено: ${totalDeals}${alertText}`;
+                const alertText = totalAlerts > 0 ? ` (<b style="color:#f87171">${totalAlerts} проблемных</b>)` : '';
+                statusMsg.innerHTML = `<i class="fas fa-check-circle" style="color:#4ade80;"></i> Загружено: ${totalDeals}${alertText}`;
             }
         }
         function parseWebhookResponse(data) {
@@ -475,13 +984,13 @@
                 const { counts, dealsMap } = parseWebhookResponse(data);
                 const total = Object.values(counts).reduce((a,b)=>a+b, 0);
                 if (total === 0) {
-                    statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#b91c1c;"></i> Пусто`;
+                    statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#f87171;"></i> Пусто`;
                     STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
                 }
                 updateStages(counts, dealsMap);
             } catch (e) {
                 console.error(e);
-                statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#b91c1c;"></i> Ошибка`;
+                statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#f87171;"></i> Ошибка`;
                 STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
                 updateStages({}, {});
             } finally {
@@ -516,8 +1025,8 @@
         };
         const STAGE_ORDER = Object.keys(STAGE_MAP);
         const ALERT_STAGES = {
-            'C2:PREPARATION':   true,   // Запрос счёта — > 10 дней от BEGINDATE
-            'C2:FINAL_INVOICE': true    // Оплачено — > 20 дней от UF_CRM_1755597807
+            'C2:PREPARATION':   true,
+            'C2:FINAL_INVOICE': true
         };
 
         let dealsData = {}, alertCounts = {}, openDropdown = null, stageElements = {};
@@ -605,9 +1114,6 @@
             el.content.innerHTML = html;
         }
 
-        // Красные счётчики:
-        //  - C2:PREPARATION (Запрос счёта) — > 10 дней от BEGINDATE
-        //  - C2:FINAL_INVOICE (Оплачено)    — > 20 дней от UF_CRM_1755597807
         function checkAlertCondition(deal, stageId) {
             const now = new Date();
             const moscowOffset = 3 * 60 * 60 * 1000;
@@ -653,8 +1159,8 @@
             if (totalDeals === 0) statusMsg.innerHTML = `<i class="fas fa-database"></i> Нет сделок (0)`;
             else {
                 const totalAlerts = Object.values(alertCounts).reduce((a,b)=>a+b, 0);
-                const alertText = totalAlerts > 0 ? ` (<b style="color:#ef4444">${totalAlerts} проблемных</b>)` : '';
-                statusMsg.innerHTML = `<i class="fas fa-check-circle" style="color:#22c55e;"></i> Загружено: ${totalDeals}${alertText}`;
+                const alertText = totalAlerts > 0 ? ` (<b style="color:#f87171">${totalAlerts} проблемных</b>)` : '';
+                statusMsg.innerHTML = `<i class="fas fa-check-circle" style="color:#4ade80;"></i> Загружено: ${totalDeals}${alertText}`;
             }
         }
 
@@ -704,13 +1210,13 @@
                 const { counts, dealsMap } = parseWebhookResponse(data);
                 const total = Object.values(counts).reduce((a,b)=>a+b, 0);
                 if (total === 0) {
-                    statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#b91c1c;"></i> Пусто`;
+                    statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#f87171;"></i> Пусто`;
                     STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
                 }
                 updateStages(counts, dealsMap);
             } catch (e) {
                 console.error(e);
-                statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#b91c1c;"></i> Ошибка`;
+                statusMsg.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#f87171;"></i> Ошибка`;
                 STAGE_ORDER.forEach(id => { counts[id]=0; dealsMap[id]=[]; });
                 updateStages({}, {});
             } finally {
