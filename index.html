@@ -1150,9 +1150,10 @@
                 wrapper.dataset.stage = stageId;
                 const circle = document.createElement('div');
                 circle.className = 'stage-circle';
+                // === ИЗМЕНЕНИЕ: убрана нумерация, кружок пустой ===
                 let badgeHtml = `<span class="count-badge" id="smt-badge-${index}">0</span>`;
                 if (ALERT_STAGES[stageId]) badgeHtml += `<span class="alert-badge" id="smt-alert-${index}" style="display:none">0</span>`;
-                circle.innerHTML = `<span>${index + 1}</span>${badgeHtml}`;
+                circle.innerHTML = `${badgeHtml}`;  // было: `<span>${index + 1}</span>` + badgeHtml
                 const label = document.createElement('div');
                 label.className = 'stage-label';
                 label.textContent = STAGE_MAP[stageId];
@@ -1377,9 +1378,10 @@
                 wrapper.dataset.stage = stageId;
                 const circle = document.createElement('div');
                 circle.className = 'stage-circle';
+                // === ИЗМЕНЕНИЕ: убрана нумерация, кружок пустой ===
                 let badgeHtml = `<span class="count-badge" id="parts-badge-${index}">0</span>`;
                 if (ALERT_STAGES[stageId]) badgeHtml += `<span class="alert-badge" id="parts-alert-${index}" style="display:none">0</span>`;
-                circle.innerHTML = `<span>${index + 1}</span>${badgeHtml}`;
+                circle.innerHTML = `${badgeHtml}`;  // было: `<span>${index + 1}</span>` + badgeHtml
                 const label = document.createElement('div');
                 label.className = 'stage-label';
                 label.textContent = STAGE_MAP[stageId];
