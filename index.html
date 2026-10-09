@@ -434,6 +434,7 @@
             padding: 20px 0;
         }
         .stage-dropdown .deal-id { font-weight: 700; }
+        .stage-dropdown .deal-mi { color: #a5b4fc !important; font-size: 13px; font-style: italic; }
         .stage-dropdown .deal-date { color: #4ade80 !important; font-weight: 600; }
         
         .dropdown-overlay {
@@ -1090,6 +1091,11 @@
                 titleText = titleText.replace(idPattern, '').trim();
                 if (titleText) parts.push(titleText);
                 
+                // Наименование МИ (UF_CRM_1595995680751) перед датой начала
+                if (deal.UF_EXTRA && String(deal.UF_EXTRA).trim() !== '') {
+                    parts.push(`<span class="deal-mi">${deal.UF_EXTRA}</span>`);
+                }
+                
                 if (deal.BEGINDATE_FORMATTED) parts.push(`<span class="deal-date">${deal.BEGINDATE_FORMATTED}</span>`);
                 
                 const finalTitle = parts.join(' ');
@@ -1150,10 +1156,9 @@
                 wrapper.dataset.stage = stageId;
                 const circle = document.createElement('div');
                 circle.className = 'stage-circle';
-                // === ИЗМЕНЕНИЕ: убрана нумерация, кружок пустой ===
                 let badgeHtml = `<span class="count-badge" id="smt-badge-${index}">0</span>`;
                 if (ALERT_STAGES[stageId]) badgeHtml += `<span class="alert-badge" id="smt-alert-${index}" style="display:none">0</span>`;
-                circle.innerHTML = `${badgeHtml}`;  // было: `<span>${index + 1}</span>` + badgeHtml
+                circle.innerHTML = `${badgeHtml}`;
                 const label = document.createElement('div');
                 label.className = 'stage-label';
                 label.textContent = STAGE_MAP[stageId];
@@ -1221,7 +1226,11 @@
                 title = title.replace(idPattern, '').trim();
                 if (title) parts.push(title);
 
-                if (deal.UF_EXTRA && String(deal.UF_EXTRA).trim() !== '') parts.push(`(${deal.UF_EXTRA})`);
+                // Наименование МИ (UF_CRM_1595995680751) перед датой
+                if (deal.UF_EXTRA && String(deal.UF_EXTRA).trim() !== '') {
+                    parts.push(`<span class="deal-mi">${deal.UF_EXTRA}</span>`);
+                }
+
                 if (deal.BEGINDATE_FORMATTED) parts.push(`<span class="deal-date">${deal.BEGINDATE_FORMATTED}</span>`);
 
                 const titleText = parts.join(' ');
@@ -1378,10 +1387,9 @@
                 wrapper.dataset.stage = stageId;
                 const circle = document.createElement('div');
                 circle.className = 'stage-circle';
-                // === ИЗМЕНЕНИЕ: убрана нумерация, кружок пустой ===
                 let badgeHtml = `<span class="count-badge" id="parts-badge-${index}">0</span>`;
                 if (ALERT_STAGES[stageId]) badgeHtml += `<span class="alert-badge" id="parts-alert-${index}" style="display:none">0</span>`;
-                circle.innerHTML = `${badgeHtml}`;  // было: `<span>${index + 1}</span>` + badgeHtml
+                circle.innerHTML = `${badgeHtml}`;
                 const label = document.createElement('div');
                 label.className = 'stage-label';
                 label.textContent = STAGE_MAP[stageId];
